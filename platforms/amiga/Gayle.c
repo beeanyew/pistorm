@@ -189,6 +189,11 @@ void writeGayle(unsigned int address, unsigned int value) {
     return;
   }
 
+  if (address == GIRQ_A4000) {
+    gayle_a4k_irq = value;
+    return;
+  }
+
   if ((address & GAYLEMASK) == CLOCKBASE) {
     if ((address & CLOCKMASK) >= 0x8000) {
       if (cdtv_mode) {
@@ -227,7 +232,46 @@ void writeGayleL(unsigned int address, unsigned int value) {
 }
 
 uint8_t readGayleB(unsigned int address) {
-  if (address == GERROR) {
+  uint8_t ide_action = 0;
+
+  if (address >= gayle_ide_base) {
+    switch (address - gayle_ide_base) {
+      case GERROR_OFFSET:
+        ide_action = ide_error_r;
+        goto ideread8;
+      case GSTATUS_OFFSET:
+        ide_action = ide_status_r;
+        goto ideread8;
+      case GSECTCOUNT_OFFSET:
+        ide_action = ide_sec_count;
+        goto ideread8;
+      case GSECTNUM_OFFSET:
+        ide_action = ide_sec_num;
+        goto ideread8;
+      case GCYLLOW_OFFSET:
+        ide_action = ide_cyl_low;
+        goto ideread8;
+      case GCYLHIGH_OFFSET:
+        ide_action = ide_cyl_hi;
+        goto ideread8;
+      case GDEVHEAD_OFFSET:
+        ide_action = ide_dev_head;
+        goto ideread8;
+      case GCTRL_OFFSET:
+        ide_action = ide_altst_r;
+        goto ideread8;
+      case GIRQ_4000_OFFSET:
+      case GIRQ_OFFSET:
+        return 0x80;
+        //gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
+    }
+    goto skip_ideread8;
+ideread8:;
+    return ide_read8(ide0, ide_action);
+skip_ideread8:;
+  }
+
+  /*if (address == GERROR) {
     return ide_read8(ide0, ide_error_r);
   }
   if (address == GSTATUS) {
@@ -256,7 +300,7 @@ uint8_t readGayleB(unsigned int address) {
 
   if (address == GCTRL) {
     return ide_read8(ide0, ide_altst_r);
-  }
+  }*/
 
   if ((address & GAYLEMASK) == CLOCKBASE) {
     if ((address & CLOCKMASK) >= 0x8000) {
