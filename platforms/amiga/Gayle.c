@@ -131,8 +131,9 @@ void writeGayleB(unsigned int address, unsigned int value) {
       case GCTRL_OFFSET:
         ide_action = ide_devctrl_w;
         goto idewrite8;
-      case GIRQ_OFFSET:
       case GIRQ_4000_OFFSET:
+        gayle_a4k_irq = value;
+      case GIRQ_OFFSET:
         gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
         return;
     }
@@ -142,65 +143,6 @@ idewrite8:;
     return;
 skip_idewrite8:;
   }
-  /*if (address == GFEAT) {
-    ide_write8(ide0, ide_feature_w, value);
-    return;
-  }
-  if (address == GCMD) {
-    ide_write8(ide0, ide_command_w, value);
-    return;
-  }
-  if (address == GSECTCNT) {
-    ide_write8(ide0, ide_sec_count, value);
-    return;
-  }
-  if (address == GSECTNUM) {
-    ide_write8(ide0, ide_sec_num, value);
-    return;
-  }
-  if (address == GCYLLOW) {
-    ide_write8(ide0, ide_cyl_low, value);
-    return;
-  }
-  if (address == GCYLHIGH) {
-    ide_write8(ide0, ide_cyl_hi, value);
-    return;
-  }
-  if (address == GDEVHEAD) {
-    ide_write8(ide0, ide_dev_head, value);
-    return;
-  }
-  if (address == GCTRL) {
-    ide_write8(ide0, ide_devctrl_w, value);
-    return;
-  }*/
-
-  /*if (address == GIRQ) {
-    //	 printf("Write Byte to Gayle GIRQ 0x%06x (0x%06x)\n",address,value);
-    gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
-
-    return;
-  }*/
-
-  /*if (address == GCS) {
-    printf("Write Byte to Gayle GCS 0x%06x (0x%06x)\n", address, value);
-    gayle_cs_mask = value & ~3;
-    gayle_cs &= ~3;
-    gayle_cs |= value & 3;
-    return;
-  }*/
-
-  /*if (address == GINT) {
-    printf("Write Byte to Gayle GINT 0x%06x (0x%06x)\n", address, value);
-    gayle_int = value;
-    return;
-  }*/
-
-  /*if (address == GCONF) {
-    printf("Write Byte to Gayle GCONF 0x%06x (0x%06x)\n", address, value);
-    gayle_cfg = value;
-    return;
-  }*/
 
   switch (address) {
     case 0xDD203A:
@@ -242,7 +184,7 @@ skip_idewrite8:;
 }
 
 void writeGayle(unsigned int address, unsigned int value) {
-  if (address == GDATA) {
+  if (address - gayle_ide_base == GDATA_OFFSET) {
     ide_write16(ide0, ide_data, value);
     return;
   }
