@@ -5,7 +5,6 @@
 #include "../../../config_file/config_file.h"
 
 static uint16_t palette[256];
-static uint8_t rtg_mem[64 * SIZE_MEGA]; // FIXME
 
 static uint8_t rtg_u8[4];
 static uint16_t rtg_x[3], rtg_y[3];
@@ -19,6 +18,8 @@ uint16_t rtg_display_width, rtg_display_height;
 uint16_t rtg_display_format;
 uint16_t rtg_pitch, rtg_total_rows;
 uint16_t rtg_offset_x, rtg_offset_y;
+
+uint8_t rtg_mem[64 * SIZE_MEGA]; // FIXME
 
 uint32_t framebuffer_addr;
 
