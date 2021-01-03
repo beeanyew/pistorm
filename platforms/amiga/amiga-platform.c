@@ -157,11 +157,11 @@ int setup_platform_amiga(struct emulator_config *cfg) {
 
     if (strlen(cfg->platform->subsys)) {
         printf("Subsystem is [%s]\n", cfg->platform->subsys);
-        if (strcmp(cfg->platform->subsys, "4000") == 0 || strcmp(cfg->platform->subsys, "3000")) {
+        if (strcmp(cfg->platform->subsys, "4000") == 0 || strcmp(cfg->platform->subsys, "3000") == 0) {
             printf("Adjusting Gayle accesses for A3000/4000 Kickstart.\n");
             adjust_gayle_4000();
         }
-        else if (strcmp(cfg->platform->subsys, "1200") == 0 || strcmp(cfg->platform->subsys, "cd32")) {
+        else if (strcmp(cfg->platform->subsys, "1200") == 0 || strcmp(cfg->platform->subsys, "cd32") == 0) {
             printf("Adjusting Gayle accesses for A1200/CD32 Kickstart.\n");
             adjust_gayle_1200();
         }

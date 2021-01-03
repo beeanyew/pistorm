@@ -296,12 +296,12 @@ skip_ideread8:;
     }
     // This seems incorrect, GARY_REG3 is the same as GIDENT, and the A4000
     // service manual says that Gary is accessible in the address range $DFC000 to $DFFFFF.
-    /*case GARY_REG0:
+    case GARY_REG0:
     case GARY_REG1:
     case GARY_REG2:
       return gary_cfg[address - GARY_REG0];
       break;
-    case GARY_REG3:
+    //case GARY_REG3:
     case GARY_REG4:
     case GARY_REG5:
       return gary_cfg[address - GARY_REG3];*/
