@@ -162,7 +162,7 @@ static void handle_rtg_command(uint32_t cmd) {
             break;
         case RTGCMD_SETPAN:
             //printf("Command: SetPan.\n");
-            framebuffer_addr = rtg_address[0];
+            framebuffer_addr = rtg_address[0] - (PIGFX_RTG_BASE + PIGFX_REG_SIZE);
             rtg_offset_x = rtg_x[1];
             rtg_offset_y = rtg_y[1];
             rtg_pitch = (rtg_x[0] << rtg_display_format);
