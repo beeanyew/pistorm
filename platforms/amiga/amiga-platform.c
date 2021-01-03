@@ -156,20 +156,23 @@ int setup_platform_amiga(struct emulator_config *cfg) {
     printf("Performing setup for Amiga platform.\n");
 
     if (strlen(cfg->platform->subsys)) {
+        printf("Subsystem is [%s]\n", cfg->platform->subsys);
         if (strcmp(cfg->platform->subsys, "4000") == 0 || strcmp(cfg->platform->subsys, "3000")) {
             printf("Adjusting Gayle accesses for A3000/4000 Kickstart.\n");
             adjust_gayle_4000();
         }
-        if (strcmp(cfg->platform->subsys, "1200") == 0 || strcmp(cfg->platform->subsys, "cd32")) {
+        else if (strcmp(cfg->platform->subsys, "1200") == 0 || strcmp(cfg->platform->subsys, "cd32")) {
             printf("Adjusting Gayle accesses for A1200/CD32 Kickstart.\n");
             adjust_gayle_1200();
         }
-        if (strcmp(cfg->platform->subsys, "cdtv") == 0) {
+        else if (strcmp(cfg->platform->subsys, "cdtv") == 0) {
             printf("Configuring platform for CDTV emulation.\n");
             cdtv_mode = 1;
             rtc_type = RTC_TYPE_MSM;
         }
     }
+    else
+        printf("No sub system specified.\n");
 
     // Look for Z2 autoconf Fast RAM by id
     int index = get_named_mapped_item(cfg, z2_autoconf_id);

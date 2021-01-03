@@ -52,6 +52,7 @@ uint8_t gayle_int;
 
 uint32_t gayle_ide_mask = ~GDATA;
 uint32_t gayle_ide_base = GDATA;
+uint8_t gayle_ide_adj = 0;
 
 struct ide_controller *get_ide(int index) {
   //if (index) {}
@@ -59,7 +60,8 @@ struct ide_controller *get_ide(int index) {
 }
 
 void adjust_gayle_4000() {
-  //gayle_ide_mask
+  gayle_ide_base = GDATA_A4000;
+  gayle_ide_adj = 2;
 }
 
 void adjust_gayle_1200() {
@@ -106,7 +108,7 @@ static uint8_t ide_action = 0;
 
 void writeGayleB(unsigned int address, unsigned int value) {
   if (address >= gayle_ide_base) {
-    switch (address - gayle_ide_base) {
+    switch (address - gayle_ide_base + gayle_ide_adj) {
       case GFEAT_OFFSET:
         ide_action = ide_feature_w;
         goto idewrite8;
@@ -234,7 +236,7 @@ void writeGayleL(unsigned int address, unsigned int value) {
 uint8_t readGayleB(unsigned int address) {
   uint8_t ide_action = 0;
 
-  if (address >= gayle_ide_base) {
+  if (address >= gayle_ide_base + gayle_ide_adj) {
     switch (address - gayle_ide_base) {
       case GERROR_OFFSET:
         ide_action = ide_error_r;
