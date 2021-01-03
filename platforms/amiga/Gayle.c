@@ -32,7 +32,6 @@
 uint8_t gary_cfg[8];
 
 uint8_t gayle_a4k = 0xA0;
-uint16_t gayle_a4k_irq;
 uint8_t ramsey_cfg = 0x08;
 static uint8_t ramsey_id = RAMSEY_REV7;
 
@@ -134,7 +133,7 @@ void writeGayleB(unsigned int address, unsigned int value) {
         ide_action = ide_devctrl_w;
         goto idewrite8;
       case GIRQ_4000_OFFSET:
-        gayle_a4k_irq = value;
+        return;
       case GIRQ_OFFSET:
         gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
         return;
@@ -192,7 +191,7 @@ void writeGayle(unsigned int address, unsigned int value) {
   }
 
   if (address == GIRQ_A4000) {
-    gayle_a4k_irq = value;
+  // just quickly return
     return;
   }
 
@@ -349,8 +348,9 @@ uint16_t readGayle(unsigned int address) {
   }
 
   if (address == GIRQ_A4000) {
-    gayle_a4k_irq = 0x8000;
-    return 0x80FF;
+    //gayle_a4k_irq = 0x8000; 
+    //just return 0x8000
+    return 0x8000;
   }
 
   if ((address & GAYLEMASK) == CLOCKBASE) {
