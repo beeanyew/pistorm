@@ -131,6 +131,10 @@ void writeGayleB(unsigned int address, unsigned int value) {
       case GCTRL_OFFSET:
         ide_action = ide_devctrl_w;
         goto idewrite8;
+      case GIRQ_OFFSET:
+      case GIRQ_4000_OFFSET:
+        gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
+        return;
     }
     goto skip_idewrite8;
 idewrite8:;
@@ -171,37 +175,54 @@ skip_idewrite8:;
     return;
   }*/
 
-  if (address == GIDENT) {
-    counter = 0;
-    // printf("Write Byte to Gayle Ident 0x%06x (0x%06x)\n",address,value);
-    return;
-  }
-
-  if (address == GIRQ) {
+  /*if (address == GIRQ) {
     //	 printf("Write Byte to Gayle GIRQ 0x%06x (0x%06x)\n",address,value);
     gayle_irq = (gayle_irq & value) | (value & (GAYLE_IRQ_RESET | GAYLE_IRQ_BERR));
 
     return;
-  }
+  }*/
 
-  if (address == GCS) {
+  /*if (address == GCS) {
     printf("Write Byte to Gayle GCS 0x%06x (0x%06x)\n", address, value);
     gayle_cs_mask = value & ~3;
     gayle_cs &= ~3;
     gayle_cs |= value & 3;
     return;
-  }
+  }*/
 
-  if (address == GINT) {
+  /*if (address == GINT) {
     printf("Write Byte to Gayle GINT 0x%06x (0x%06x)\n", address, value);
     gayle_int = value;
     return;
-  }
+  }*/
 
-  if (address == GCONF) {
+  /*if (address == GCONF) {
     printf("Write Byte to Gayle GCONF 0x%06x (0x%06x)\n", address, value);
     gayle_cfg = value;
     return;
+  }*/
+
+  switch (address) {
+    case 0xDD203A:
+      gayle_a4k = value;
+      return;
+    case GIDENT:
+      counter = 0;
+      return;
+    case GCONF:
+      gayle_cfg = value;
+      return;
+    case RAMSEY_REG:
+      ramsey_cfg = value & 0x0F;
+      return;
+    case GINT:
+      gayle_int = value;
+      return;
+    case GCS:
+      gayle_cs_mask = value & ~3;
+      gayle_cs &= ~3;
+      gayle_cs |= value & 3;
+      return;
   }
 
   if ((address & GAYLEMASK) == CLOCKBASE) {
