@@ -94,14 +94,14 @@ void InitGayle(void) {
 
 uint8_t CheckIrq(void) {
   uint8_t irq;
-
-  if (gayle_int & (1 << 7)) {
+  // commenting out this conditional made a4000 IDE operate at decent speed.
+  //if (gayle_int & (1 << 7)) {
     irq = ide0->drive->intrq;
     //	if (irq==0)
     //	printf("IDE IRQ: %x\n",irq);
     return irq;
-  };
-  return 0;
+  //};
+  //return 0;
 }
 
 static uint8_t ide_action = 0;
