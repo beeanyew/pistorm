@@ -29,69 +29,12 @@
 //#define GCLOW   0xda2010
 //#define GDH	0xda2018
 
-// Gayle Addresses
+uint8_t gary_cfg0[8];
 
-// Gayle IDE Reads
-#define GERROR 0xda2004   // Error
-#define GSTATUS 0xda201c  // Status
-// Gayle IDE Writes
-#define GFEAT 0xda2004  // Write : Feature
-#define GCMD 0xda201c   // Write : Command
-// Gayle IDE RW
-#define GDATA 0xda2000     // Data
-#define GSECTCNT 0xda2008  // SectorCount
-#define GSECTNUM 0xda200c  // SectorNumber
-#define GCYLLOW 0xda2010   // CylinderLow
-#define GCYLHIGH 0xda2014  // CylinderHigh
-#define GDEVHEAD 0xda2018  // Device/Head
-#define GCTRL 0xda3018     // Control
-// Gayle Ident
-#define GIDENT 0xDE1000
-
-// Gayle IRQ/CC
-#define GCS 0xDA8000   // Card Control
-#define GIRQ 0xDA9000  // IRQ
-#define GINT 0xDAA000  // Int enable
-#define GCONF 0xDAB000  // Gayle Config
-
-/* DA8000 */
-#define GAYLE_CS_IDE 0x80   /* IDE int status */
-#define GAYLE_CS_CCDET 0x40 /* credit card detect */
-#define GAYLE_CS_BVD1 0x20  /* battery voltage detect 1 */
-#define GAYLE_CS_SC 0x20    /* credit card status change */
-#define GAYLE_CS_BVD2 0x10  /* battery voltage detect 2 */
-#define GAYLE_CS_DA 0x10    /* digital audio */
-#define GAYLE_CS_WR 0x08    /* write enable (1 == enabled) */
-#define GAYLE_CS_BSY 0x04   /* credit card busy */
-#define GAYLE_CS_IRQ 0x04   /* interrupt request */
-#define GAYLE_CS_DAEN 0x02  /* enable digital audio */
-#define GAYLE_CS_DIS 0x01   /* disable PCMCIA slot */
-
-/* DA9000 */
-#define GAYLE_IRQ_IDE 0x80
-#define GAYLE_IRQ_CCDET 0x40 /* credit card detect */
-#define GAYLE_IRQ_BVD1 0x20  /* battery voltage detect 1 */
-#define GAYLE_IRQ_SC 0x20    /* credit card status change */
-#define GAYLE_IRQ_BVD2 0x10  /* battery voltage detect 2 */
-#define GAYLE_IRQ_DA 0x10    /* digital audio */
-#define GAYLE_IRQ_WR 0x08    /* write enable (1 == enabled) */
-#define GAYLE_IRQ_BSY 0x04   /* credit card busy */
-#define GAYLE_IRQ_IRQ 0x04   /* interrupt request */
-#define GAYLE_IRQ_RESET 0x02 /* reset machine after CCDET change */
-#define GAYLE_IRQ_BERR 0x01  /* generate bus error after CCDET change */
-
-/* DAA000 */
-#define GAYLE_INT_IDE 0x80     /* IDE interrupt enable */
-#define GAYLE_INT_CCDET 0x40   /* credit card detect change enable */
-#define GAYLE_INT_BVD1 0x20    /* battery voltage detect 1 change enable */
-#define GAYLE_INT_SC 0x20      /* credit card status change enable */
-#define GAYLE_INT_BVD2 0x10    /* battery voltage detect 2 change enable */
-#define GAYLE_INT_DA 0x10      /* digital audio change enable */
-#define GAYLE_INT_WR 0x08      /* write enable change enabled */
-#define GAYLE_INT_BSY 0x04     /* credit card busy */
-#define GAYLE_INT_IRQ 0x04     /* credit card interrupt request */
-#define GAYLE_INT_BVD_LEV 0x02 /* BVD int level, 0=lev2,1=lev6 */
-#define GAYLE_INT_BSY_LEV 0x01 /* BSY int level, 0=lev2,1=lev6 */
+uint8_t gayle_a4k = 0xA0;
+uint16_t gayle_a4k_irq;
+uint8_t ramsey_cfg = 0x08;
+static uint8_t ramsey_id = RAMSEY_REV7;
 
 int counter;
 static uint8_t gayle_irq, gayle_cs, gayle_cs_mask, gayle_cfg;
@@ -107,9 +50,20 @@ unsigned char cdtv_sram[32 * SIZE_KILO];
 
 uint8_t gayle_int;
 
+uint32_t gayle_ide_mask = ~GDATA;
+uint32_t gayle_ide_base = GDATA;
+
 struct ide_controller *get_ide(int index) {
   //if (index) {}
   return ide0;
+}
+
+void adjust_gayle_4000() {
+  //gayle_ide_mask
+}
+
+void adjust_gayle_1200() {
+
 }
 
 void set_hard_drive_image_file_amiga(uint8_t index, char *filename) {
@@ -148,8 +102,43 @@ uint8_t CheckIrq(void) {
   return 0;
 }
 
+static uint8_t ide_action = 0;
+
 void writeGayleB(unsigned int address, unsigned int value) {
-  if (address == GFEAT) {
+  if (address >= gayle_ide_base) {
+    switch (address - gayle_ide_base) {
+      case GFEAT_OFFSET:
+        ide_action = ide_feature_w;
+        goto idewrite8;
+      case GCMD_OFFSET:
+        ide_action = ide_command_w;
+        goto idewrite8;
+      case GSECTCOUNT_OFFSET:
+        ide_action = ide_sec_count;
+        goto idewrite8;
+      case GSECTNUM_OFFSET:
+        ide_action = ide_sec_num;
+        goto idewrite8;
+      case GCYLLOW_OFFSET:
+        ide_action = ide_cyl_low;
+        goto idewrite8;
+      case GCYLHIGH_OFFSET:
+        ide_action = ide_cyl_hi;
+        goto idewrite8;
+      case GDEVHEAD_OFFSET:
+        ide_action = ide_dev_head;
+        goto idewrite8;
+      case GCTRL_OFFSET:
+        ide_action = ide_devctrl_w;
+        goto idewrite8;
+    }
+    goto skip_idewrite8;
+idewrite8:;
+    ide_write8(ide0, ide_action, value);
+    return;
+skip_idewrite8:;
+  }
+  /*if (address == GFEAT) {
     ide_write8(ide0, ide_feature_w, value);
     return;
   }
@@ -180,7 +169,7 @@ void writeGayleB(unsigned int address, unsigned int value) {
   if (address == GCTRL) {
     ide_write8(ide0, ide_devctrl_w, value);
     return;
-  }
+  }*/
 
   if (address == GIDENT) {
     counter = 0;

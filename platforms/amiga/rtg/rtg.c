@@ -176,7 +176,7 @@ static void handle_rtg_command(uint32_t cmd) {
             int r = (int)((float)rtg_u8[1] / 255.0f * 31.0f);
             int g = (int)((float)rtg_u8[2] / 255.0f * 63.0f);
             int b = (int)((float)rtg_u8[3] / 255.0f * 31.0f);
-            palette[rtg_u8[0]] = ((r & 0x1F) << 11) | ((g & 0x3F) << 6) | ((b & 0x1F) << 6);
+            palette[rtg_u8[0]] = ((r & 0x1F) << 11) | ((g & 0x3F) << 6) | (b & 0x1F);
             break;
         }
         case RTGCMD_SETDISPLAY:
