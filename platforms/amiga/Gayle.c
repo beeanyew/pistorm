@@ -303,7 +303,7 @@ skip_ideread8:;
       break;
     //case GARY_REG3:
     case GARY_REG4:
-    case GARY_REG5:
+    //case GARY_REG5:
       return gary_cfg[address - GARY_REG3];*/
     case RAMSEY_ID:
       return ramsey_id;
