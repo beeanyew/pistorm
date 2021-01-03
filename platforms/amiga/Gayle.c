@@ -29,7 +29,7 @@
 //#define GCLOW   0xda2010
 //#define GDH	0xda2018
 
-uint8_t gary_cfg0[8];
+uint8_t gary_cfg[8];
 
 uint8_t gayle_a4k = 0xA0;
 uint16_t gayle_a4k_irq;
@@ -304,7 +304,7 @@ skip_ideread8:;
     //case GARY_REG3:
     case GARY_REG4:
     //case GARY_REG5:
-      return gary_cfg[address - GARY_REG3];*/
+      return gary_cfg[address - GARY_REG3];
     case RAMSEY_ID:
       return ramsey_id;
     case RAMSEY_REG:
