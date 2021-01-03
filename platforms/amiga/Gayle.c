@@ -271,36 +271,56 @@ ideread8:;
 skip_ideread8:;
   }
 
-  /*if (address == GERROR) {
-    return ide_read8(ide0, ide_error_r);
+  switch (address) {
+    case GIDENT: {
+      uint8_t val;
+      // printf("Read Byte from Gayle Ident 0x%06x (0x%06x)\n",address,counter);
+      if (counter == 0 || counter == 1 || counter == 3) {
+        val = 0x80;  // 80; to enable gayle
+      } else {
+        val = 0x00;
+      }
+      counter++;
+      return val;
+    }
+    case GINT:
+      return gayle_int;
+    case GCONF:
+      return gayle_cfg & 0x0f;
+    case GCS: {
+      uint8_t v;
+      v = gayle_cs_mask | gayle_cs;
+      return v;
+    }
+    // This seems incorrect, GARY_REG3 is the same as GIDENT, and the A4000
+    // service manual says that Gary is accessible in the address range $DFC000 to $DFFFFF.
+    /*case GARY_REG0:
+    case GARY_REG1:
+    case GARY_REG2:
+      return gary_cfg[address - GARY_REG0];
+      break;
+    case GARY_REG3:
+    case GARY_REG4:
+    case GARY_REG5:
+      return gary_cfg[address - GARY_REG3];*/
+    case RAMSEY_ID:
+      return ramsey_id;
+    case RAMSEY_REG:
+      return ramsey_cfg;
+    case GARY_REG5: { // This makes no sense.
+      uint8_t val;
+      printf("Read Byte from GARY Ident 0x%06x (0x%06x)\n",address,counter);
+      if (counter == 0 || counter == 1 || counter == 3) {
+        val = 0x80;  // 80; to enable GARY
+      } else {
+        val = 0x00;
+      }
+      counter++;
+      return val;
+    }
+    case 0xDD203A:
+      return gayle_a4k;
   }
-  if (address == GSTATUS) {
-    return ide_read8(ide0, ide_status_r);
-  }
-
-  if (address == GSECTCNT) {
-    return ide_read8(ide0, ide_sec_count);
-  }
-
-  if (address == GSECTNUM) {
-    return ide_read8(ide0, ide_sec_num);
-  }
-
-  if (address == GCYLLOW) {
-    return ide_read8(ide0, ide_cyl_low);
-  }
-
-  if (address == GCYLHIGH) {
-    return ide_read8(ide0, ide_cyl_hi);
-  }
-
-  if (address == GDEVHEAD) {
-    return ide_read8(ide0, ide_dev_head);
-  }
-
-  if (address == GCTRL) {
-    return ide_read8(ide0, ide_altst_r);
-  }*/
 
   if ((address & GAYLEMASK) == CLOCKBASE) {
     if ((address & CLOCKMASK) >= 0x8000) {
@@ -314,62 +334,21 @@ skip_ideread8:;
     return get_rtc_byte(address, rtc_type);
   }
 
-  if (address == GIDENT) {
-    uint8_t val;
-    // printf("Read Byte from Gayle Ident 0x%06x (0x%06x)\n",address,counter);
-    if (counter == 0 || counter == 1 || counter == 3) {
-      val = 0x80;  // 80; to enable gayle
-    } else {
-      val = 0x00;
-    }
-    counter++;
-    return val;
-  }
-
-  if (address == GIRQ) {
-    //	printf("Read Byte From GIRQ Space 0x%06x\n",gayle_irq);
-
-    return 0x80;//gayle_irq;
-/*
-    uint8_t irq;
-    irq = ide0->drive->intrq;
-
-    if (irq == 1) {
-      // printf("IDE IRQ: %x\n",irq);
-      return 0x80;  // gayle_irq;
-    }
-
-    return 0;
-*/ 
- }
-
-  if (address == GCS) {
-    printf("Read Byte From GCS Space 0x%06x\n", 0x1234);
-    uint8_t v;
-    v = gayle_cs_mask | gayle_cs;
-    return v;
-  }
-
-  if (address == GINT) {
-    //	printf("Read Byte From GINT Space 0x%06x\n",gayle_int);
-    return gayle_int;
-  }
-
-  if (address == GCONF) {
-    printf("Read Byte From GCONF Space 0x%06x\n", gayle_cfg & 0x0f);
-    return gayle_cfg & 0x0f;
-  }
-
   printf("Read Byte From Gayle Space 0x%06x\n", address);
   return 0xFF;
 }
 
 uint16_t readGayle(unsigned int address) {
-  if (address == GDATA) {
+  if (address - gayle_ide_base == GDATA_OFFSET) {
     uint16_t value;
     value = ide_read16(ide0, ide_data);
     //	value = (value << 8) | (value >> 8);
     return value;
+  }
+
+  if (address == GIRQ_A4000) {
+    gayle_a4k_irq = 0x8000;
+    return 0x80FF;
   }
 
   if ((address & GAYLEMASK) == CLOCKBASE) {
