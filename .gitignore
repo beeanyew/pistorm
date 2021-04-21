@@ -6,9 +6,9 @@
 *.bin
 *.exe
 *.stackdump
-!/platforms/amiga/piscsi/*.rom
-/m68kmake
-/m68kmake.exe
-/m68kops.c
-/m68kops.h
-/emulator
+/src/m68kmake
+/src/m68kmake.exe
+/src/m68kops.c
+/src/m68kops.h
+/src/emulator
+!/src/platforms/amiga/piscsi/*.rom
