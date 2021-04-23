@@ -13,6 +13,8 @@
 #include "platforms/amiga/piscsi/piscsi-enums.h"
 #include "platforms/amiga/net/pi-net.h"
 #include "platforms/amiga/net/pi-net-enums.h"
+#include "platforms/amiga/pistorm-dev/pistorm-dev.h"
+#include "platforms/amiga/pistorm-dev/pistorm-dev-enums.h"
 #include "gpio/ps_protocol.h"
 
 #include <assert.h>
@@ -64,7 +66,7 @@ uint8_t realtime_disassembly, int2_enabled = 0;
 uint32_t do_disasm = 0, old_level;
 uint32_t last_irq = 8, last_last_irq = 8;
 
-uint8_t end_signal = 0;
+uint8_t end_signal = 0, load_new_config = 0;
 
 char disasm_buf[4096];
 
@@ -260,6 +262,11 @@ cpu_loop:
     mouse_extra = 0x00;
   }
 
+  if (load_new_config) {
+    printf("[CPU] Loading new config file.\n");
+    goto stop_cpu_emulation;
+  }
+
   if (end_signal)
 	  goto stop_cpu_emulation;
 
@@ -450,6 +457,9 @@ int main(int argc, char *argv[]) {
       } else {
         g++;
         cfg = load_config_file(argv[g]);
+        if (cfg) {
+          set_pistorm_devcfg_filename(argv[g]);
+        }
       }
     }
     else if (strcmp(argv[g], "--keyboard-file") == 0 || strcmp(argv[g], "--kbfile") == 0) {
@@ -459,6 +469,31 @@ int main(int argc, char *argv[]) {
         g++;
         strcpy(keyboard_file, argv[g]);
       }
+    }
+  }
+
+switch_config:
+  if (load_new_config != 0) {
+    uint8_t config_action = load_new_config - 1;
+    load_new_config = 0;
+    free_config_file(cfg);
+    if (cfg) {
+      free(cfg);
+      cfg = NULL;
+    }
+
+    for(int i = 0; i < 2 * SIZE_MEGA; i++) {
+      write8(i, 0);
+    }
+
+    switch(config_action) {
+      case PICFG_LOAD:
+      case PICFG_RELOAD:
+        cfg = load_config_file(get_pistorm_devcfg_filename());
+        break;
+      case PICFG_DEFAULT:
+        cfg = load_config_file("default.cfg");
+        break;
     }
   }
 
@@ -569,14 +604,16 @@ int main(int argc, char *argv[]) {
   m68k_set_cpu_type(cpu_type);
   cpu_pulse_reset();
 
-  pthread_t ipl_tid, cpu_tid, kbd_tid;
+  pthread_t ipl_tid = 0, cpu_tid, kbd_tid;
   int err;
-  err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
-  if (err != 0)
-    printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
-  else {
-    pthread_setname_np(ipl_tid, "pistorm: ipl");
-    printf("IPL thread created successfully\n");
+  if (ipl_tid == 0) {
+    err = pthread_create(&ipl_tid, NULL, &ipl_task, NULL);
+    if (err != 0)
+      printf("[ERROR] Cannot create IPL thread: [%s]", strerror(err));
+    else {
+      pthread_setname_np(ipl_tid, "pistorm: ipl");
+      printf("IPL thread created successfully\n");
+    }
   }
 
   // create keyboard task
@@ -599,12 +636,21 @@ int main(int argc, char *argv[]) {
 
   // wait for cpu task to end before closing up and finishing
   pthread_join(cpu_tid, NULL);
-  printf("[MAIN] All threads appear to have concluded; ending process\n");
+
+  if (load_new_config == 0)
+    printf("[MAIN] All threads appear to have concluded; ending process\n");
 
   if (mouse_fd != -1)
     close(mouse_fd);
   if (mem_fd)
     close(mem_fd);
+
+  if (load_new_config != 0)
+    goto switch_config;
+
+  if (cfg->platform->shutdown) {
+    cfg->platform->shutdown(cfg);
+  }
 
   return 0;
 }
