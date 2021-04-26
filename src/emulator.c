@@ -473,6 +473,8 @@ int main(int argc, char *argv[]) {
   }
 
 switch_config:
+  srand(clock());
+
   if (load_new_config != 0) {
     uint8_t config_action = load_new_config - 1;
     load_new_config = 0;
@@ -482,9 +484,9 @@ switch_config:
       cfg = NULL;
     }
 
-    for(int i = 0; i < 2 * SIZE_MEGA; i++) {
+    /*for(int i = 0; i < 2 * SIZE_MEGA; i++) {
       write8(i, 0);
-    }
+    }*/
 
     switch(config_action) {
       case PICFG_LOAD:
