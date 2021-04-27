@@ -48,9 +48,9 @@ char *hunk_id_name(uint32_t index) {
 int process_hunk(uint32_t index, struct hunk_info *info, FILE *f, struct hunk_reloc *r) {
     if (!f)
         return -1;
-    
+
     uint32_t discard = 0, cur_hunk = 0, offs32 = 0;
-    
+
     switch (index) {
         case HUNKTYPE_HEADER:
             DEBUG("Processing hunk header.\n");
@@ -62,7 +62,7 @@ int process_hunk(uint32_t index, struct hunk_info *info, FILE *f, struct hunk_re
                     info->num_libs++;
                 }
             } while (discard);
-            
+
             READLW(info->table_size, f);
             DEBUG("Table size: %d\n", info->table_size);
             READLW(info->first_hunk, f);
@@ -222,7 +222,7 @@ int load_lseg(int fd, uint8_t **buf_p, struct hunk_info *i, struct hunk_reloc *r
         lseek64(fd, next_blk * 512, SEEK_SET);
         read(fd, block, 512);
     } while (next_blk != 0xFFFFFFFF);
-    
+
     uint32_t file_size = ftell(out);
     fseek(out, 0, SEEK_SET);
     uint8_t *buf = malloc(file_size + 1024);
