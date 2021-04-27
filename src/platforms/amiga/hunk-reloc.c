@@ -211,6 +211,10 @@ int load_lseg(int fd, uint8_t **buf_p, struct hunk_info *i, struct hunk_reloc *r
 
     char *filename = "data/lsegout.bin";
     FILE *out = fopen(filename, "wb+");
+    if (out == NULL) {
+        fprintf(stderr, "Error: Couldn't open `%s` for writing (check directory and permissions)\n", filename);
+        goto fail;
+    }
 
     DEBUG("[LOAD_LSEG] LSEG data:\n");
     DEBUG("[LOAD_LSEG] Longs: %d HostID: %d\n", BE(lsb->lsb_SummedLongs), BE(lsb->lsb_HostID));
