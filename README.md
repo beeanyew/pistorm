@@ -107,6 +107,8 @@ If no fatal error messages are printed on screen and you see a message saying `s
     Documentation (please write some documentation?)
   * `example`<br/>
     Configuration examples
+    * `boot_scripts`<br/>
+      A systemd service file to start the PiStorm emulator on boot
   * `hardware`<br/>
     Schematics, gerbers, bill of materials, pick-and-place instructions for assembly
   * `src`<br/>
