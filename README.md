@@ -16,7 +16,7 @@ There's also an IRC channel on the Freenode IRC network, `#PiStorm`, which is br
 
 ## Project information
 
-The PiStorm itself is an adapter board intended to be paired with a Raspberry Pi Model 3A+. It goes in the DIP socket on and acts in place of the CPU, but functionality can be extended beyond simple CPU emulation. 3B/3B+ works, but due to component clearance issues it will not fit unless the Pi itself is modified (USB ports replaced) or a GPIO spacer/relocator is installed.
+The PiStorm itself is an adapter board intended to be paired with a Raspberry Pi Model 3A+. The adapter is placed in the DIP socket and acts in place of the CPU, but functionality can be extended beyond simple CPU emulation. The Pi Model 3B/3B+ works, but due to component clearance issues it will not fit unless the Pi itself is modified (USB ports replaced) or a GPIO spacer/relocator is installed.
 
 Hardware files are available in [PiStorm_RevB_EPM240_74LVC16373.zip](./hardware/PiStorm_RevB_EPM240_74LVC16373.zip), but they may be out of date. Joining the Discord and checking for the latest revision/BoM for the PiStorm adapter board is recommended.
 
