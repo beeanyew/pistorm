@@ -12,3 +12,4 @@
 /src/m68kops.h
 /src/emulator
 !/src/platforms/amiga/piscsi/*.rom
+/*.cfg
