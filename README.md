@@ -2,26 +2,36 @@
 
 ![PiStorm logo](./doc/pistorm_logo.jpg)
 
+## What is this?
+
+A 68000 emulator, providing pin-level compatibility with a DIP-socketed 68000 CPU from a Raspberry Pi via a CPLD.
+
+The simulated CPU can host memory expansions, virtual hardware (disk controller, real-time graphics, intercepting traffic to native custom chips).
+
 ## Join us on Discord or on Freenode IRC #PiStorm
 
-* There's a Discord server dedicated to PiStorm discussion and development, which you can join through [this handy invite link](https://discord.com/invite/j6rPtzxaNW).
-* There's also an IRC channel on the Freenode IRC network, `#PiStorm`, which is bridged with the `#general` channel on Discord.
+There's a Discord server dedicated to PiStorm discussion and development, which you can join through [this handy invite link](https://discord.com/invite/j6rPtzxaNW).
+
+There's also an IRC channel on the Freenode IRC network, `#PiStorm`, which is bridged with the `#general` channel on Discord.
 
 ## Project information
 
-* The PiStorm itself is an adapter board intended to be paired with a Raspberry Pi Model 3A+. It goes in the DIP socket on and acts in place of the CPU, but functionality can be extended beyond simple CPU emulation.
-* Hardware files are available in [PiStorm_RevB_EPM240_74LVC16373.zip](./hardware/PiStorm_RevB_EPM240_74LVC16373.zip), but they may be out of date. Joining the Discord and checking for the latest revision/BoM for the PiStorm adapter board is recommended.
-* Selling blank PCBs or derivatives on eBay or similar for excessive profit is frowned upon and may lead to forthcoming related projects being closed source.
-* This is not meant to discourage you from making PiStorm boards for others to enjoy, but for instance selling the product as a commercial item and then pawning off support to the community if something doesn't work is absolutely not good™.
+The PiStorm itself is an adapter board intended to be paired with a Raspberry Pi Model 3A+. It goes in the DIP socket on and acts in place of the CPU, but functionality can be extended beyond simple CPU emulation. 3B/3B+ works, but due to component clearance issues it will not fit unless the Pi itself is modified (USB ports replaced) or a GPIO spacer/relocator is installed.
 
-* While the PiStorm should work with any DIP socket 16-bit 68000-powered system, the FC lines are currently not properly handled and no guarantees can be made for it working on anything except an Amiga 500, 500+ and 2000.
-* General Performance with the current use of Musashi as the 68k CPU emulator is somewhere around a 70-80 MHz 68030.
-* The intended Raspberry Pi model to use with the PiStorm is Model 3A+. 3B/3B+ works, but due to component clearance issues it will not fit unless the Pi itself is modified (USB ports replaced) or a GPIO spacer/relocator is installed.
-* The Raspberry Pi Zero and Model 1B+/2/4 cannot currently be used with the PiStorm, and support for these is not officially planned yet.
+Hardware files are available in [PiStorm_RevB_EPM240_74LVC16373.zip](./hardware/PiStorm_RevB_EPM240_74LVC16373.zip), but they may be out of date. Joining the Discord and checking for the latest revision/BoM for the PiStorm adapter board is recommended.
+
+Selling blank PCBs or derivatives on eBay or similar for excessive profit is frowned upon and may lead to forthcoming related projects being closed source. **This is not meant to discourage you from making PiStorm boards for others to enjoy**, but for instance selling the product as a commercial item and then pawning off support to the community if something doesn't work is absolutely not good™.
+
+While the PiStorm should work with any DIP socket 16-bit 68000-powered system, the FC lines are currently not properly handled and no guarantees can be made for it working on anything except an Amiga 500, 500+ and 2000.
+
+General Performance with the current use of Musashi as the 68k CPU emulator is somewhere around a 70-80 MHz 68030.
+
+The Raspberry Pi Zero and Model 1B+/2/4 cannot currently be used with the PiStorm, and support for these is not officially planned yet.
 
 ## Amiga-specific functionality
 
 Since much of the initial work and testing for the PiStorm was done on Amiga computers, a number of extended features are available when the PiStorm is paired with for instance an Amiga 500:
+
 * Kickstart ROM mapping: 1.3, 2.0, 3.1, anything you might own and have dumped in a byteswapped format. Extended ROM mapping as well for instance with the CDTV extended BIOS.
   * An A1200 3.1+ Kickstart ROM is currently recommended, as this one has the most dynamic automatic configuration on boot.
 * Fast RAM: Z2, Z3 and CPU local Fast can be mapped for high performance memory available to the CPU only on the PiStorm side of things.
