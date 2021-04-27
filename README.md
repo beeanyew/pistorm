@@ -68,7 +68,7 @@ Now the final steps to get things up and running, all of this is done from a com
 sudo apt-get install git libsdl2-dev
 git clone https://github.com/captain-amygdala/pistorm.git
 cd pistorm
-(cd src && make)
+make
 cp example/default.cfg .
 ```
 
